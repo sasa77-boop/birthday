@@ -8,7 +8,7 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Google Fonts: Inter, Dancing Script & Playfair Display -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
@@ -99,9 +99,9 @@
     }
 
     .timer-circle {
-      stroke-dasharray: 440;
+      stroke-dasharray: 439.82;
       stroke-dashoffset: 0;
-      transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+      transition: stroke-dashoffset 1s linear;
     }
 
     .ribbon {
@@ -329,10 +329,7 @@
 
         <div class="relative bg-white p-4 sm:p-6 rounded-3xl border border-pink-100 glow-card overflow-hidden">
           <div class="relative w-full h-[450px] sm:h-[600px] rounded-2xl overflow-hidden bg-pink-50/40 flex items-center justify-center p-2 border border-pink-100/50">
-            <img id="carousel-image" src="maloka1.jpg" alt="Maloka Memory" class="max-h-full max-w-full w-auto h-auto object-contain rounded-xl shadow-md transition-opacity duration-300" onerror="this.onerror=null; this.src='https://placehold.co/600x800/FCE7F3/8B5CF6?text=Maloka+Memory';"/>
-            <div class="absolute top-4 right-4 bg-black/70 backdrop-blur-md text-white px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-lg">
-              <span id="current-slide">1</span> / <span id="total-slides">9</span>
-            </div>
+            <img id="carousel-image" src="maloka1.jpg" alt="Maloka Memory" class="max-h-full max-w-full w-auto h-auto object-contain rounded-xl shadow-md" onerror="this.onerror=null; this.src='https://placehold.co/600x800/FCE7F3/8B5CF6?text=Maloka+Memory';"/>
           </div>
 
           <div class="flex items-center justify-between mt-6 px-2">
@@ -370,6 +367,12 @@
       "maloka1.jpg", "maloka2.jpg", "maloka3.jpg", "maloka4.jpg",
       "maloka5.jpg", "maloka6.jpg", "maloka7.jpg", "maloka8.jpg", "maloka9.jpg"
     ];
+
+    // Preload Images for Instant Carousel Switching
+    images.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
 
     let currentImageIndex = 0;
 
@@ -412,18 +415,21 @@
       const countEl = document.getElementById("countdown-number");
       const circleProgress = document.getElementById("timer-progress");
       
-      const circumference = 2 * Math.PI * 70;
+      const circumference = 2 * Math.PI * 70; // ~439.82
       circleProgress.style.strokeDasharray = circumference;
+      circleProgress.style.strokeDashoffset = 0;
 
       const timerInterval = setInterval(() => {
         timeLeft--;
         countEl.textContent = timeLeft;
+        
         const offset = circumference - (timeLeft / totalTime) * circumference;
         circleProgress.style.strokeDashoffset = offset;
 
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
-          triggerCelebration();
+          circleProgress.style.strokeDashoffset = circumference;
+          setTimeout(triggerCelebration, 300);
         }
       }, 1000);
     }
@@ -538,7 +544,6 @@
     }
 
     function setupCarousel() {
-      document.getElementById("total-slides").textContent = images.length;
       renderDots();
       updateCarousel();
     }
@@ -557,7 +562,6 @@
     function updateCarousel() {
       const imgEl = document.getElementById("carousel-image");
       imgEl.src = images[currentImageIndex];
-      document.getElementById("current-slide").textContent = currentImageIndex + 1;
       renderDots();
     }
 
